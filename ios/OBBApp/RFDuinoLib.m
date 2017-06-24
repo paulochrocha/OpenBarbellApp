@@ -32,6 +32,19 @@ RCT_EXPORT_METHOD(start)
   self.manager.delegate = self;
 }
 
+RCT_EXPORT_METHOD(enableLogging)
+{
+  [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"canLog"];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+RCT_EXPORT_METHOD(disableLogging)
+{
+  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"canLog"];
+  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"log"];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 RCT_EXPORT_METHOD(startScan)
 {
   [self.manager startScan];

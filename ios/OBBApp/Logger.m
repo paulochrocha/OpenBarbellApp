@@ -66,6 +66,13 @@
 }
 
 - (void)syncLogs {
+  // check if allowed to sync logs
+  if (![[NSUserDefaults standardUserDefaults] objectForKey:@"canLog"]) {
+    NSLog(@"not allowed to log, not special user");
+    return;
+  }
+  
+  // check if logs
   NSArray *existingLogs = [[NSUserDefaults standardUserDefaults] objectForKey:logKey];
   if (existingLogs == nil || existingLogs.count == 0) {
     NSLog(@"No logs to sync, backing out");

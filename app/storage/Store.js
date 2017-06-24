@@ -5,11 +5,12 @@ import reducers from '../reducers/Reducers';
 import middlewares from '../middlewares/Middlewares';
 import throttle from 'lodash/throttle';
 import config from '../config.json';
-import { Alert, AsyncStorage } from 'react-native';
+import { Alert, AsyncStorage, NativeModules } from 'react-native';
 import { LOAD_PERSISTED_SET_DATA } from '../ActionTypes';
 import * as SetActionCreators from '../actions/SetActionCreators';
 import * as AuthActionCreators from '../actions/AuthActionCreators';
 import * as SettingsActionCreators from '../actions/SettingsActionCreators';
+const RFDuinoLib = NativeModules.RFDuinoLib;
 
 const key = '@OpenBarbellPersistedStore'
 
@@ -91,6 +92,11 @@ const loadInitialState = async (store) => {
 				let email = value.auth.email;
 				if (email === undefined) {
 					email = null;
+				}
+				if (email === 'theemailaddy@gmail.com') {
+					RFDuinoLib.enableLogging();
+				} else {
+					RFDuinoLib.disableLogging();
 				}
 				console.log("loading previous " + refreshToken + " " + accessToken + " " + email);
 				store.dispatch(AuthActionCreators.saveUser(refreshToken, accessToken, email));

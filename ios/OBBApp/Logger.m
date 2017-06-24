@@ -41,6 +41,12 @@
 }
 
 - (void)log:(NSString *)message {
+  // check if allowed to sync logs
+  if (![[NSUserDefaults standardUserDefaults] objectForKey:@"canLog"]) {
+    NSLog(@"not allowed to log, not special user");
+    return;
+  }
+  
   @synchronized (self) {
     // get array
     NSArray *existingLogs = [[NSUserDefaults standardUserDefaults] objectForKey:logKey];

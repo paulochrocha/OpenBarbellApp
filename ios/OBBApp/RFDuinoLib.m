@@ -41,7 +41,6 @@ RCT_EXPORT_METHOD(enableLogging)
 RCT_EXPORT_METHOD(disableLogging)
 {
   [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"canLog"];
-  [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"log"];
   [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

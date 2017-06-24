@@ -13,6 +13,8 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import "Logger.h"
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -32,11 +34,34 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
+  [[Logger sharedLogger] log:@"App started"];
+  
   return YES;
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
   return [RNGoogleSignin application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+  [[Logger sharedLogger] log:@"App Will Resign Active"];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+  [[Logger sharedLogger] log:@"App did Enter Background"];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+  [[Logger sharedLogger] log:@"App Will Enter Foreground"];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+  [[Logger sharedLogger] log:@"App Did Become Active"];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+  [[Logger sharedLogger] log:@"App Will Terminate"];
 }
 
 @end

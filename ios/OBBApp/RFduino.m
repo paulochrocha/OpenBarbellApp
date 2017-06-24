@@ -25,8 +25,8 @@
 */
 
 #import "RFduino.h"
-
-#import "RFduinoManager.h"
+#import "RfduinoManager.h"
+#import "Logger.h"
 
 static const int max_data = 12;
 
@@ -83,7 +83,9 @@ static void incrementUuid16(CBUUID *uuid, unsigned char amount)
 }
 @end
 
-@implementation RFduino
+@implementation RFduino {
+  NSTimer *timer;
+}
 
 @synthesize delegate;
 @synthesize rfduinoManager;
@@ -97,13 +99,23 @@ static void incrementUuid16(CBUUID *uuid, unsigned char amount)
 
 - (id)init
 {
-    NSLog(@"rfduino init");
-    
-    self = [super init];
-    if (self) {
-    }
-    
-    return self;
+  NSLog(@"rfduino init");
+  
+  self = [super init];
+  if (self) {
+    timer = nil;
+  }
+  
+  return self;
+}
+
+
+- (void)logRSSI {
+  if (!peripheral) {
+    return;
+  }
+  
+  [peripheral readRSSI];
 }
 
 - (void)connected
@@ -123,6 +135,14 @@ static void incrementUuid16(CBUUID *uuid, unsigned char amount)
     peripheral.delegate = self;
     
     [peripheral discoverServices:[NSArray arrayWithObject:service_uuid]];
+  
+  if (!timer) {
+    timer = [NSTimer scheduledTimerWithTimeInterval:20
+                                             target:self
+                                           selector:@selector(logRSSI)
+                                           userInfo:nil
+                                            repeats:YES];
+  }
 }
 
 #pragma mark - CBPeripheralDelegate methods
@@ -172,6 +192,14 @@ static void incrementUuid16(CBUUID *uuid, unsigned char amount)
     }
 }
 
+- (void)peripheral:(CBPeripheral *)peripheral didReadRSSI:(NSNumber *)RSSI error:(NSError *)error {
+  if (error != nil) {
+    [[Logger sharedLogger] log:[NSString stringWithFormat:@"Failed to read RSSI %@", error.localizedDescription]];
+  } else {
+    [[Logger sharedLogger] log:[NSString stringWithFormat:@"RSSI %@", RSSI]];
+  }
+}
+
 #pragma mark - RFduino methods
 
 - (void)send:(NSData *)data
@@ -190,6 +218,9 @@ static void incrementUuid16(CBUUID *uuid, unsigned char amount)
 - (void)disconnect
 {
     NSLog(@"rfduino disconnect");
+  
+  [timer invalidate];
+  timer = nil;
     
     if (loadedService) {
         NSLog(@"writing to disconnect characteristic");

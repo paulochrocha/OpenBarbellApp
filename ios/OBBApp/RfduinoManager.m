@@ -26,9 +26,9 @@
 
 #include <objc/message.h>
 
-#import "RFduinoManager.h"
-
+#import "RfduinoManager.h"
 #import "RFduino.h"
+#import "Logger.h"
 
 static CBUUID *service_uuid;
 
@@ -162,6 +162,7 @@ static CBUUID *service_uuid;
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
     NSLog(@"didConnectPeripheral");
+  [[Logger sharedLogger] log:@"CBCentralManager DidConnectPeripheral"];
 
     RFduino *rfduino = [self rfduinoForPeripheral:peripheral];
     if (rfduino) {
@@ -178,6 +179,7 @@ static CBUUID *service_uuid;
   // The original code taken from RFDuino's sample code would then result in disconnect not propagating to React Native properly
   // Original code left here for reference
     NSLog(@"didDisconnectPeripheral");
+  [[Logger sharedLogger] log:@"CBCentralManager DidDisconnectPeripheral"];
 
 //    void (^block)(void) = ^{
         if ([delegate respondsToSelector:@selector(didDisconnectRFduino:)]) {

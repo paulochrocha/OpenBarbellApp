@@ -7,9 +7,10 @@
 //
 
 #import "RFDuinoLib.h"
-#import "RFduinoManager.h"
+#import "RfduinoManager.h"
 #import "RFduino.h"
 #import "RFduino+Dictionary.h"
+#import "Logger.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 
 @interface RFDuinoLib () <RFduinoManagerDelegate, RFduinoDelegate, CBCentralManagerDelegate>
@@ -78,6 +79,8 @@ RCT_EXPORT_METHOD(disconnectDevice)
 
 - (void)didConnectRFduino:(RFduino *)rfduino {
   NSLog(@"%@ connected to %@", self, [rfduino toDictionary]);
+  [[Logger sharedLogger] log:[NSString stringWithFormat:@"Connected to %@ with ID %@", rfduino.name, rfduino.peripheral.identifier.UUIDString]];
+
   rfduino.delegate = self;
   [self sendEventWithName:@"Connected" body:[rfduino toDictionary]];
 }
@@ -87,6 +90,8 @@ RCT_EXPORT_METHOD(disconnectDevice)
 }
 
 - (void)didDisconnectRFduino:(RFduino *)rfduino {
+  [[Logger sharedLogger] log:[NSString stringWithFormat:@"Disconnected from %@ with ID %@", rfduino.name, rfduino.peripheral.identifier.UUIDString]];
+
   NSLog(@"%@ disconnected from %@", self, [rfduino toDictionary]);
   rfduino.delegate = nil;
   [self sendEventWithName:@"Disconnected" body:[rfduino toDictionary]];
@@ -107,12 +112,39 @@ RCT_EXPORT_METHOD(disconnectDevice)
   NSString *stringData = [[NSNumber numberWithFloat:z] stringValue];
   
   NSLog(@"%@ received data %@ %f sending data %@", self, data, z, stringData);
+  [[Logger sharedLogger] setLastDataReceivedDate:[NSDate date]];
   [self sendEventWithName:@"Data" body:stringData];
 }
 
 #pragma mark - Bluetooth delegate functions
-
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
+  //log the central manager state
+  NSString *message = nil;
+  switch (central.state) {
+    case CBManagerStateUnknown:
+      message = @"CBManagerStateUnknown";
+      break;
+    case CBManagerStateResetting:
+      message = @"CBManagerStateResetting";
+      break;
+    case CBManagerStateUnsupported:
+      message = @"CBManagerStateUnsupported";
+      break;
+    case CBManagerStateUnauthorized:
+      message = @"CBManagerStateUnauthorized";
+      break;
+    case CBManagerStatePoweredOff:
+      message = @"CBManagerStatePoweredOff";
+      break;
+    case CBManagerStatePoweredOn:
+      message = @"CBManagerStatePoweredOn";
+      break;
+
+    default:
+      break;
+  }
+  [[Logger sharedLogger] log:message];
+  
   if (central.state != CBCentralManagerStatePoweredOn) {
     [self sendEventWithName:@"BluetoothOff" body:nil];
   }else {

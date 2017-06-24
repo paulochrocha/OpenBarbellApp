@@ -34,7 +34,8 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
-  
+
+  [[Logger sharedLogger] syncLogs];
   [[Logger sharedLogger] log:@"App started"];
   
   return YES;

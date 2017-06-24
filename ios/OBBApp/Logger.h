@@ -13,5 +13,5 @@
 + (Logger *) sharedLogger;
 - (void)setLastDataReceivedDate:(NSDate *)date;
 - (void) log:(NSString *)message;
-
+- (void)syncLogs;
 @end

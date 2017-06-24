@@ -137,6 +137,7 @@ static void incrementUuid16(CBUUID *uuid, unsigned char amount)
     [peripheral discoverServices:[NSArray arrayWithObject:service_uuid]];
   
   if (!timer) {
+    [self logRSSI];
     timer = [NSTimer scheduledTimerWithTimeInterval:20
                                              target:self
                                            selector:@selector(logRSSI)

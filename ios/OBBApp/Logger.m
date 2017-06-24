@@ -43,11 +43,11 @@
 - (void)log:(NSString *)message {
   @synchronized (self) {
     // get array
-    NSArray *existingLog = [[NSUserDefaults standardUserDefaults] objectForKey:logKey];
-    if (existingLog == nil) {
-      existingLog = @[];
+    NSArray *existingLogs = [[NSUserDefaults standardUserDefaults] objectForKey:logKey];
+    if (existingLogs == nil) {
+      existingLogs = @[];
     }
-    NSMutableArray *array = [NSMutableArray arrayWithArray:existingLog];
+    NSMutableArray *array = [NSMutableArray arrayWithArray:existingLogs];
     
     // new entry
     NSDictionary *dictionary = @{
@@ -63,6 +63,28 @@
     
     NSLog(@"%@", dictionary);
   }
+}
+
+- (void)syncLogs {
+  NSArray *existingLogs = [[NSUserDefaults standardUserDefaults] objectForKey:logKey];
+  if (existingLogs == nil || existingLogs.count == 0) {
+    NSLog(@"No logs to sync, backing out");
+    return;
+  }
+  
+  // TODO: update this to live once it's ready
+  NSURL *url = [NSURL URLWithString:@"https://obbstaging.herokuapp.com/log"];
+  NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:existingLogs options:NSJSONWritingPrettyPrinted error:nil];
+
+  [request setHTTPMethod:@"POST"];
+  [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+  [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+  [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[jsonData length]] forHTTPHeaderField:@"Content-Length"];
+  [request setHTTPBody: jsonData];
+
+  NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:nil];
+  NSLog(@"Log sync attempted");
 }
 
 @end

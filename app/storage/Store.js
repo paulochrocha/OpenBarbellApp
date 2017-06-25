@@ -93,7 +93,7 @@ const loadInitialState = async (store) => {
 				if (email === undefined) {
 					email = null;
 				}
-				if (email === 'theemailaddy@gmail.com') {
+				if (email === 'lnbackr@gmail.com') {
 					RFDuinoLib.enableLogging();
 				} else {
 					RFDuinoLib.disableLogging();
